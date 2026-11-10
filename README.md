@@ -28,9 +28,13 @@ npm run preview
 
 피부 변화 기록은 기존 `skin-diary` 저장소를 유지합니다. 새 기록의 상태는 좋아짐/비슷함/나빠짐이며 이전 시제품의 기록은 변환·삭제하지 않습니다. 사진 업로드는 미구현입니다.
 
-## Supabase (다음 단계)
+## Supabase 연결 사전 점검
 
-현재 Supabase SDK, 네트워크 연결, 마이그레이션 및 초기화 명령은 없습니다. 기존 데이터베이스를 변경하지 않습니다. 필요할 때 `.env.example`을 `.env.local`로 복사하고 URL 및 브라우저용 publishable key를 설정하세요. VITE_ 변수는 빌드 결과에 공개되므로 service_role 키, 비밀번호, 서버 전용 API 키를 절대 입력하지 마세요. `.env` 및 `.env.*`는 예시 파일을 제외하고 Git에서 무시됩니다.
+현재 실제 스키마는 확인하지 못했습니다. [테이블·필요 데이터 목록 및 연결 경계](docs/supabase-preflight.md), [SQL Editor용 읽기 전용 점검 SQL](sql/inspect-existing-schema.sql)을 확인하세요. SQL은 마이그레이션이 아니며 기존 테이블/정책/트리거/Storage를 변경하지 않습니다.
+
+환경변수가 없으면 기존 브라우저 체험 모드가 유지됩니다. 설정하려면 `.env.example`을 `.env.local`로 복사해 HTTPS 프로젝트 URL과 **공개용** publishable/anon 키만 넣고 서버를 재시작하세요. VITE_ 변수는 브라우저에 공개됩니다. service_role·sb_secret_ 키·비밀번호는 넣지 마세요. 실제 값을 GitHub나 채팅에 공유하지 마세요.
+
+현재 연결 코드는 사용자가 ‘연결 상태 확인’을 눌렀을 때 Data API 메타데이터 응답만 확인합니다. 성공해도 테이블·RLS·회원 데이터 연결 완료를 뜻하지 않으며, 제품 조회/루틴 저장/관심제품/피부 기록/Auth/Storage는 아직 서버에 연결되지 않습니다. 로컬 데이터는 자동 이전·삭제·대체하지 않습니다. 네트워크 오류나 키 오류가 있어도 브라우저 체험 기능을 유지합니다. 기존 로그인 세션을 사용·수정하지 않습니다.
 
 ## Cloudflare Pages 설정 안내 (배포하지 않음)
 
@@ -49,3 +53,5 @@ npm run preview
 - `npm run test:browser`: Playwright로 PC/모바일 7개 화면, 마우스·터치 정렬, 일괄 저장·재조회·취소, 관심제품 독립성, 비교 제한, 저장 실패, 피부 기록 등을 검증. 자체적으로 임시 Vite 서버(4175)를 시작하고 종료합니다.
 
 브라우저 테스트는 기본 `/usr/bin/chromium`을 사용합니다. 다른 설치 경로라면 `CHROMIUM_PATH=/path/to/chromium npm run test:browser`를 사용하세요. Chromium을 설치할 때 TLS 검증이나 네트워크 정책을 우회하지 마세요. 외부 폰트가 차단되면 시스템 글꼴을 사용합니다.
+
+- `npm run test:connection-browser`: 가짜 테스트 공개 키와 차단된 테스트 도메인의 **모의 응답**만 사용하여 연결 상태 및 기존 데이터 보존을 검증합니다. 실제 Supabase 연결 테스트가 아닙니다.

@@ -8,10 +8,14 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --test",
-    "test:browser": "node scripts/browser-smoke.mjs"
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "test:connection-browser": "node scripts/connection-browser.mjs"
   },
   "devDependencies": {
     "playwright": "^1.65.0",
     "vite": "^7.2.2"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.0"
   }
 }

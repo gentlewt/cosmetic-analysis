@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
-const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','4175','--strictPort'], {stdio:'pipe'});
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','4175','--strictPort'], {stdio:'pipe',env:{...process.env,VITE_SUPABASE_URL:'',VITE_SUPABASE_PUBLISHABLE_KEY:''}});
 const base='http://127.0.0.1:4175';
 let browser;
 try {
@@ -12,6 +12,8 @@ try {
   const context=await browser.newContext({viewport:{width:1440,height:1000},hasTouch:true});
   const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
   await page.goto(base+'/#routine');
+  await page.locator('[data-connection-status="demo"]').waitFor();
+  assert.equal(await page.locator('#check-connection').count(),0);
   const add=async id=>{await page.locator('#add-product').selectOption(id);await page.locator('#add-item').click();};
   await add('calm');await add('serum');await add('cream');
   await page.locator('[data-frequency="0"]').selectOption('격일');

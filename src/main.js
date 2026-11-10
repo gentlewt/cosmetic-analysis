@@ -1,4 +1,8 @@
 import './style.css';
+import { createSupabaseConnection } from './lib/supabase.js';
+import { mountConnectionPanel } from './lib/connection-panel.js';
+const connection = createSupabaseConnection(import.meta.env);
+let unmountConnectionPanel;
 import { products, ingredients, searchProducts } from './data.js';
 import { FREQUENCIES, PERIODS, emptyRoutine, clone, addItem, moveItem, confirmVersion, readGuest, writeGuest, toggleComparison } from './routines.js';
 
@@ -51,7 +55,9 @@ function content(page) {
 }
 function render() {
   currentPage=location.hash.slice(1)||'home';
-  app.innerHTML=`<header><a class="brand" href="#home"><span class="brand-mark">✳</span><span>내 화장품 조합,<br><b>나에게 잘 맞을까?</b></span></a><nav aria-label="주 메뉴">${nav.map(([id,label])=>`<a href="#${id}" ${currentPage===id?'aria-current="page"':''}>${label}</a>`).join('')}</nav></header><main id="main"><p id="status" role="status">${esc(message)}</p>${storageNotice?`<p class="notice" role="alert">${esc(storageNotice)}</p>`:''}${content(currentPage)}</main><footer><a class="footer-brand" href="#home">내 화장품 조합, 나에게 잘 맞을까?</a><p>가상 제품으로 구성한 개발 화면 · 실제 분석 결과를 제공하지 않습니다.</p></footer>`;
+  app.innerHTML=`<header><a class="brand" href="#home"><span class="brand-mark">✳</span><span>내 화장품 조합,<br><b>나에게 잘 맞을까?</b></span></a><nav aria-label="주 메뉴">${nav.map(([id,label])=>`<a href="#${id}" ${currentPage===id?'aria-current="page"':''}>${label}</a>`).join('')}</nav></header><main id="main"><aside id="connection-panel" aria-label="데이터 연결 상태"></aside><p id="status" role="status">${esc(message)}</p>${storageNotice?`<p class="notice" role="alert">${esc(storageNotice)}</p>`:''}${content(currentPage)}</main><footer><a class="footer-brand" href="#home">내 화장품 조합, 나에게 잘 맞을까?</a><p>가상 제품으로 구성한 개발 화면 · 실제 분석 결과를 제공하지 않습니다.</p></footer>`;
+  unmountConnectionPanel?.();
+  unmountConnectionPanel = mountConnectionPanel(app.querySelector('#connection-panel'), connection);
   bind();
 }
 function updateDraft(next, note='루틴을 수정했습니다. 확정 버튼을 눌러 저장하세요.') { draft=next; message=note; render(); }
